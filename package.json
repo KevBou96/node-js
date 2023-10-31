@@ -14,10 +14,14 @@
     "nodemon": "^1.18.3"
   },
   "dependencies": {
+    "bluebird": "^3.7.2",
     "body-parser": "^1.18.3",
+    "dotenv": "^16.3.1",
     "ejs": "^2.6.1",
     "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
+    "pg": "^8.11.3",
+    "pg-promise": "^11.5.4",
     "pug": "^2.0.3"
   }
 }

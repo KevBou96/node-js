@@ -2,7 +2,7 @@ const Product = require('../models/product');
 const Cart = require('../models/cart');
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll(products => {
+  Product.getProducts().then(products => {
     res.render('shop/product-list', {
       prods: products,
       pageTitle: 'All Products',
@@ -13,7 +13,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.getProduct = (req, res, next) => {
   const prodId = req.params.productId;
-  Product.findById(prodId, product => {
+  Product.findById(prodId).then(product => {
     res.render('shop/product-detail', {
       product: product,
       pageTitle: product.title,
@@ -23,7 +23,7 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll(products => {
+  Product.getProducts().then(products => {
     res.render('shop/index', {
       prods: products,
       pageTitle: 'Shop',
@@ -33,40 +33,46 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  Cart.getCart(cart => {
-    Product.fetchAll(products => {
-      const cartProducts = [];
-      for (product of products) {
-        const cartProductData = cart.products.find(
-          prod => prod.id === product.id
-        );
-        if (cartProductData) {
-          cartProducts.push({ productData: product, qty: cartProductData.qty });
-        }
-      }
-      res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart',
-        products: cartProducts
-      });
+  let totalPrice = 0;
+  let cartProducts = []
+  Cart.getCart().then(data => {
+    cartProducts = data;
+    data.forEach(element => {
+      totalPrice +=  element.price*element.qty
     });
-  });
-};
+    res.render('shop/cart', {
+      path: '/cart',
+      pageTitle: 'Your Cart',
+      products: cartProducts,
+      tPrice: totalPrice
+    })
+  }).catch(err => {
+    console.log(err);
+  })  
+}
 
 exports.postCart = (req, res, next) => {
-  const prodId = req.body.productId;
-  Product.findById(prodId, product => {
-    Cart.addProduct(prodId, product.price);
-  });
-  res.redirect('/cart');
+  const prodId = req.body.productId;  
+  Cart.AddProductToCart(prodId).then(() => {
+    res.redirect('/cart');
+  }).catch(err => {
+    res.status(500).json({
+      message: 'parameters are missing',
+      error: err
+    })
+  })
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId;
-  Product.findById(prodId, product => {
-    Cart.deleteProduct(prodId, product.price);
-    res.redirect('/cart');
-  });
+  const prodId = req.body.user_id;
+  Cart.deleteProductFromCart(prodId).then((data) => {
+    res.redirect('/cart')
+  }).catch(err => {
+    res.status(500).json({
+      message: 'parameters are missing',
+      error: err
+    })
+  })
 };
 
 exports.getOrders = (req, res, next) => {
