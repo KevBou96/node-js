@@ -25,19 +25,19 @@ module.exports = class Product {
   }
 
   updateProduct() {
-    return db.none('UPDATE products SET title = $1, imgurl = $2, price = $3, description = $4 WHERE user_id = $5', [this.title, this.imageUrl, this.price, this.description, this.id])
+    return db.none('UPDATE products SET title = $1, imgurl = $2, price = $3, description = $4 WHERE product_id = $5', [this.title, this.imageUrl, this.price, this.description, this.id])
   }
 
   static deleteById(id) {
-    return db.none(`DELETE FROM products WHERE user_id = $1`, id);
+    return db.none(`DELETE FROM products WHERE product_id = $1`, id);
   }
 
   static findById(id) {
-    return db.one(`select * from products where user_id = $1`, id);
+    return db.one(`select * from products where product_id = $1`, id);
   }
 
   static getProducts() {
-    return db.any('select * from products order by user_id');
+    return db.any('select * from products order by product_id');
   }
 };
 

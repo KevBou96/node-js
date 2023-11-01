@@ -11,7 +11,7 @@ const p = path.join(
 module.exports = class Cart {
 
   static deleteProductFromCart(id) {
-    return db.one('UPDATE products SET incart = false, qty = 0 WHERE user_id =$1 RETURNING *', id)
+    return db.one('UPDATE products SET incart = false, qty = 0 WHERE product_id = $1 RETURNING *', id)
   }
 
   static getCart(cb) {
@@ -19,6 +19,6 @@ module.exports = class Cart {
   }
 
    static AddProductToCart(id) {
-    return db.none('UPDATE products SET incart = true, qty = qty + 1 WHERE user_id = $1', id);
+    return db.none('UPDATE products SET incart = true, qty = qty + 1 WHERE product_id = $1', id);
   }
 };

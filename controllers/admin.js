@@ -46,7 +46,7 @@ exports.getEditProduct = (req, res, next) => {
 };
 
 exports.postEditProduct = (req, res, next) => {
-  const prodId = req.body.user_id;
+  const prodId = req.body.product_id;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
   const updatedImageUrl = req.body.imageUrl;
@@ -77,7 +77,7 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.postDeleteProduct = (req, res, next) => {
-  const prodId = req.body.user_id;
+  const prodId = req.body.product_id;
   Product.deleteById(prodId).then(() => {
     res.redirect('/admin/products');
   }).catch(err => {
