@@ -36,8 +36,8 @@ exports.getCart = (req, res, next) => {
   let totalPrice = 0;
   let cartProducts = []
   Cart.getCart().then(data => {
-    cartProducts = data;
-    data.forEach(element => {
+    cartProducts = [...data];
+    cartProducts.forEach(element => {
       totalPrice +=  element.price*element.qty
     });
     res.render('shop/cart', {
@@ -52,10 +52,11 @@ exports.getCart = (req, res, next) => {
 }
 
 exports.postCart = (req, res, next) => {
-  const prodId = req.body.productId;  
+  const prodId = req.body.productId;
   Cart.AddProductToCart(prodId).then(() => {
     res.redirect('/cart');
   }).catch(err => {
+    console.log(err);
     res.status(500).json({
       message: 'parameters are missing',
       error: err
@@ -65,6 +66,7 @@ exports.postCart = (req, res, next) => {
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.product_id;
+  console.log(prodId,'sdsda');
   Cart.deleteProductFromCart(prodId).then((data) => {
     res.redirect('/cart')
   }).catch(err => {
