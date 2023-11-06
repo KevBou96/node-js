@@ -53,7 +53,7 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
   const prodId = req.body.productId;
-  Cart.AddProductToCart(prodId).then(() => {
+  Cart.AddProductToCart(prodId).then((data) => {
     res.redirect('/cart');
   }).catch(err => {
     console.log(err);
@@ -66,7 +66,6 @@ exports.postCart = (req, res, next) => {
 
 exports.postCartDeleteProduct = (req, res, next) => {
   const prodId = req.body.product_id;
-  console.log(prodId,'sdsda');
   Cart.deleteProductFromCart(prodId).then((data) => {
     res.redirect('/cart')
   }).catch(err => {
@@ -76,6 +75,22 @@ exports.postCartDeleteProduct = (req, res, next) => {
     })
   })
 };
+
+exports.emptyCart = (req, res, next) => {
+  Cart.emptyCart().then(() => {
+    res.redirect('/orders')
+  }).catch(err => {
+    res.status(500).json({
+      message: 'error',
+      error: err
+    })
+  })
+}
+
+exports.createOrder = (req, res, next) => {
+  totalPrice = req.body.total_price;
+  Cart.createOrder(totalPrice);
+} 
 
 exports.getOrders = (req, res, next) => {
   res.render('shop/orders', {

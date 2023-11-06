@@ -18,6 +18,14 @@
                         </li>
                     <% }) %>
                 </ul>
+                <form action="/empty-cart" method="post">
+                    <input type="hidden">
+                    <button class="btn success" type="submit">Empty Cart</button>
+                </form>
+                <form action="/create-order" method="post">
+                    <input type="hidden" value="<%= tPrice %>" name="total_price">
+                    <button class="btn success" type="submit">Checkout</button>
+                </form>
                 <h3 class="cart__item">TOTAL PRICE: <%= tPrice %></h3>
             <% } else { %>
                 <h1>No Products in Cart!</h1>
