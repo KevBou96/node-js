@@ -37,18 +37,4 @@ module.exports = class Cart {
   static emptyCart() {
     return db.none('DELETE FROM cart WHERE user_id = 1');
   }
-
-  static createOrder(totalPrice) {
-    const createOrderPromise = db.one('INSERT INTO orders (user_id, total) VALUES(1, $1) RETURNING order_id', totalPrice);
-    createOrderPromise.then((res) => {
-      let orderId = res.order_id;
-      console.log(orderId, 'order id');
-    });
-    const getProductsIdPromise = db.any('SELECT p.product_id FROM products p INNER JOIN cart c ON c.product_id = p.product_id WHERE c.user_id = 1 ORDER BY c.cart_id');
-    getProductsIdPromise.then((res) => {
-      console.log(res); 
-    })
-
-    Promise.all([createOrderPromise, getProductsIdPromise])
-  }
 };

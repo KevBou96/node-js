@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const Cart = require('../models/cart');
+const Order = require('../models/order');
 
 exports.getProducts = (req, res, next) => {
   Product.getProducts().then(products => {
@@ -89,14 +90,34 @@ exports.emptyCart = (req, res, next) => {
 
 exports.createOrder = (req, res, next) => {
   totalPrice = req.body.total_price;
-  Cart.createOrder(totalPrice);
+  Order.createOrder(totalPrice).then((data) => {
+    res.redirect('/orders')
+  }).catch(err => {
+    res.status(500).json({
+      message: 'error',
+      error: err
+    })
+  })
 } 
 
 exports.getOrders = (req, res, next) => {
-  res.render('shop/orders', {
-    path: '/orders',
-    pageTitle: 'Your Orders'
+  Order.getOrders().then(data => {
+    console.log(data);
+    // res.render('shop/orders', {
+    //   path: '/orders',
+    //   pageTitle: 'Your Orders'
+    // });
+    res.status(200).json({
+      message: 'success',
+      response: data
+    })
+  }).catch(err => {
+    res.status(500).json({
+      message: 'error',
+      error: err
+    })
   });
+  
 };
 
 exports.getCheckout = (req, res, next) => {
