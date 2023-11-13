@@ -24,6 +24,7 @@ module.exports = class Order {
       }
 
       static getOrders() {
-        return db.any('SELECT i.order_id, i.product_id, i.qty, o.total FROM order_items i INNER JOIN orders o ON i.order_id = o.order_id WHERE o.user_id = 1')
+        return db.any('SELECT i.order_id, i.product_id, i.qty, o.total FROM order_items i INNER JOIN orders o ON i.order_id = o.order_id WHERE o.user_id = 1');
+        // return db.any('SELECT order_id FROM orders WHERE user_id = 1')
       }
 }
