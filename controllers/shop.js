@@ -35,8 +35,9 @@ exports.getIndex = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   let totalPrice = 0;
-  let cartProducts = []
-  Cart.getCart().then(data => {
+  let cartProducts = [];
+  let user_id = req.session.user_id
+  Cart.getCart(user_id).then(data => {
     cartProducts = [...data];
     cartProducts.forEach(element => {
       totalPrice +=  element.price*element.qty
@@ -53,8 +54,9 @@ exports.getCart = (req, res, next) => {
 }
 
 exports.postCart = (req, res, next) => {
-  const prodId = req.body.productId;
-  Cart.AddProductToCart(prodId).then((data) => {
+  const product_id = req.body.productId;
+  const user_id = req.session.user_id;
+  Cart.AddProductToCart(product_id, user_id).then((data) => {
     res.redirect('/cart');
   }).catch(err => {
     console.log(err);
@@ -66,8 +68,9 @@ exports.postCart = (req, res, next) => {
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
-  const prodId = req.body.product_id;
-  Cart.deleteProductFromCart(prodId).then((data) => {
+  const product_id = req.body.product_id;
+  const user_id = req.session.user_id;
+  Cart.deleteProductFromCart(product_id, user_id).then((data) => {
     res.redirect('/cart')
   }).catch(err => {
     res.status(500).json({
@@ -78,7 +81,8 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.emptyCart = (req, res, next) => {
-  Cart.emptyCart().then(() => {
+  const user_id = req.session.user_id;
+  Cart.emptyCart(user_id).then(() => {
     res.redirect('/orders')
   }).catch(err => {
     res.status(500).json({
@@ -89,10 +93,12 @@ exports.emptyCart = (req, res, next) => {
 }
 
 exports.createOrder = (req, res, next) => {
-  totalPrice = req.body.total_price;
-  Order.createOrder(totalPrice).then((data) => {
+  let totalPrice = req.body.total_price;
+  const user_id = req.session.user_id;
+  Order.createOrder(totalPrice, user_id).then((data) => {
     res.redirect('/orders')
   }).catch(err => {
+    console.log(err);
     res.status(500).json({
       message: 'error',
       error: err
@@ -101,7 +107,8 @@ exports.createOrder = (req, res, next) => {
 } 
 
 exports.getOrders = (req, res, next) => {
-  Order.getOrders().then(data => {
+  const user_id = req.session.user_id;
+  Order.getOrders(user_id).then(data => {
     console.log(data);
     // res.render('shop/orders', {
     //   path: '/orders',
