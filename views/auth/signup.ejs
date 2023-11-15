@@ -7,7 +7,11 @@
    <%- include('../includes/navigation.ejs') %>
 
     <main>
-        <form class="product-form" action="/login-user" method="POST">
+        <form class="product-form" action="/signup-user" method="POST">
+            <div class="form-control">
+                <label for="title">Name</label>
+                <input type="text" name="name" id="name">
+            </div>
             <div class="form-control">
                 <label for="imageUrl">Email</label>
                 <input type="email" name="email" id="email">
@@ -15,6 +19,10 @@
             <div class="form-control">
                 <label for="price">Password</label>
                 <input type="password" name="password" id="password">
+            </div>
+            <div class="form-control">
+                <label for="price">Confirm Password</label>
+                <input type="confirmPassword" name="confirmPassword" id="confirmPassword">
             </div>
             <button class="btn" type="submit">Login</button>
         </form>

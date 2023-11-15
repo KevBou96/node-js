@@ -28,6 +28,14 @@
             <li class="main-header__item">
                 <a class="<%= path === '/login' ? 'active' : '' %>" href="/login">Login</a>
             </li>
+            <li class="main-header__item">
+                <a class="<%= path === '/signup' ? 'active' : '' %>" href="/signup">Signup</a>
+            </li>
+            <li class="main-header__item">
+                <form action="/logout" method="POST">
+                    <button type="submit">Logout</button>
+                </form>
+            </li>
         </ul>
     </nav>
 </header>
@@ -50,6 +58,11 @@
             <ul class="main-header__item-list">
                 <li class="main-header__item">
                     <a href="/login">Login</a>
+                </li>
+                <li class="main-header__item-list">
+                    <form action="/logout" method="POST">
+                        <button type="submit">Logout</button>
+                    </form>
                 </li>
             </ul>
 </nav>
