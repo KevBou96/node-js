@@ -11,15 +11,15 @@ module.exports = class Order {
             const getProductIds = t.any('SELECT p.product_id, c.qty FROM products p INNER JOIN cart c ON c.product_id = p.product_id WHERE c.user_id = $1 ORDER BY c.cart_id', user_id);
             const deleteCart = Cart.emptyCart(user_id);
             return t.batch([createOrderQuery, getProductIds, deleteCart]);
-        }).then((res) => {
-            let orderId = res[0].order_id;
-            let pIds = [];
-            let pQty = []
-            res[1].map((ele) =>{
-                pIds.push(ele.product_id);
-                pQty.push(ele.qty)
-            })
-            return db.any('INSERT INTO order_items(order_id, product_id, qty) SELECT $1, UNNEST(ARRAY[$2:csv]), UNNEST(ARRAY[$3:csv])', [orderId, [pIds], [pQty]]);
+            }).then((res) => {
+                let orderId = res[0].order_id;
+                let pIds = [];
+                let pQty = []
+                res[1].map((ele) =>{
+                    pIds.push(ele.product_id);
+                    pQty.push(ele.qty)
+                })
+                return db.any('INSERT INTO order_items(order_id, product_id, qty) SELECT $1, UNNEST(ARRAY[$2:csv]), UNNEST(ARRAY[$3:csv])', [orderId, [pIds], [pQty]]);
         })
       }
 

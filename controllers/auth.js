@@ -1,4 +1,5 @@
 const Auth = require('../models/auth')
+const bcrypt = require('bcryptjs');
 
 exports.getLogin = (req, res, next) => {
     const sessionVal = req.session;
@@ -17,18 +18,25 @@ exports.postLogin = (req, res, next) => {
     Auth.loginUser(name, email, password)
     .then(result => {
         if(result) {
-            req.session.isLoggedIn = true;
-            req.session.user_id = result[0].user_id
-            res.redirect('/')
+            bcrypt.compare(password, result.password)
+            .then(doMatch => {
+                if (doMatch) {
+                    req.session.isLoggedIn = true;
+                    req.session.user_id = result.user_id
+                    return res.redirect('/')
+                } 
+                res.redirect('/login')
+            }).catch(err => {
+                console.log(err);
+            })
         } else {
-            throw(err)
+            throw "user does not exists"
         }
     }).catch(err => {
         console.log(err);
         res.status(500).json({
-            message: 'could not add user to database',
+            message: 'user does not exists',
             err: err
-            
         })
     })
 }
@@ -44,17 +52,18 @@ exports.postSignUp = (req, res, next) => {
     const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
-    Auth.signUpUser(name, email, password).then((result) => {
-        console.log(result);
-        res.redirect('/login')
-    }).catch(err => {
-        console.log(err);
-        res.status(500).json({
-            message: 'could not add user to database',
-            err: err
-            
+    const hashing = bcrypt.hash(password, 12);
+    hashing.then((hashedPassword) => {
+        Auth.signUpUser(name, email, hashedPassword).then(() => {
+            res.redirect('/login')
+        }).catch(err => {
+            res.status(500).json({
+                message: 'user already exists',
+                err: err
+            })
         })
     })
+    
 }
 
 exports.logOut = (req, res , next) => {
