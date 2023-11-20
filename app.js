@@ -3,7 +3,7 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
-
+const flash = require('connect-flash')
 
 const errorController = require('./controllers/error');
 
@@ -27,6 +27,7 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }))
+app.use(flash())
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);

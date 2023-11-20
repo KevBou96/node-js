@@ -10,18 +10,16 @@
         <% if (errorMessage) { %>
             <div><%= errorMessage %></div>
         <% } %>
-        <div></div>
-        <form class="product-form" action="/login-user" method="POST">
+        
+        <form class="product-form" action="/reset-pass" method="POST">
+            <div class="center-text">
+                <h2>Enter Email To Reset Pass</h1>
+            </div>
             <div class="form-control">
                 <label for="imageUrl">Email</label>
                 <input type="email" name="email" id="email">
             </div>
-            <div class="form-control">
-                <label for="price">Password</label>
-                <input type="password" name="password" id="password">
-            </div>
-            <button class="btn" type="submit">Login</button>
-            <a href="/reset-pass">Reset Password</a>
+            <button class="btn" type="submit">Submit</button>
         </form>
     </main>
 <%- include('../includes/end.ejs') %>
