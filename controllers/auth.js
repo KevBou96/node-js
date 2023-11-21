@@ -2,6 +2,7 @@ const Auth = require('../models/auth')
 const bcrypt = require('bcryptjs');
 const { log } = require('console');
 const crypto = require('crypto');
+const { validationResult } = require('express-validator')
 
 exports.getLogin = (req, res, next) => {
     const sessionVal = req.session;
@@ -17,6 +18,15 @@ exports.getLogin = (req, res, next) => {
 exports.postLogin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password
+    console.log(req.body);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).render('auth/login', {
+            pageTitle: 'Login',
+            path: '/login',
+            errorMessage: errors.array()[0].msg
+        })
+    }
     Auth.loginUser(email, password)
     .then(result => {
         if(result) {
@@ -25,16 +35,16 @@ exports.postLogin = (req, res, next) => {
                 if (doMatch) {
                     req.session.isLoggedIn = true;
                     req.session.user_id = result.user_id
-                    return res.redirect('/')
+                    return res.status(200).redirect('/')
                 } 
                 req.flash('error', 'Wrong Password')
-                res.redirect('/login')
+                return res.redirect('/login')
             }).catch(err => {
                 console.log(err);
             })
         } else {
             req.flash('error', 'Invalid email')
-            res.redirect('/login')
+            return res.redirect('/login')
         }
     }).catch(err => {
         console.log(err);
@@ -48,7 +58,8 @@ exports.postLogin = (req, res, next) => {
 exports.getSignUp = (req, res, next) => {
         res.render('auth/signup', {
             pageTitle: 'Sign Up',
-            path: '/signup'
+            path: '/signup',
+            errorMessage: req.flash('error')
         })
 }
 
@@ -56,6 +67,15 @@ exports.postSignUp = (req, res, next) => {
     const name = req.body.name;
     const email = req.body.email;
     const password = req.body.password;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors.array());
+        return res.status(422).render('auth/signup', {
+            pageTitle: 'Sign Up',
+            path: '/signup',
+            errorMessage: errors.array()[0].msg
+        })
+    }
     const hashing = bcrypt.hash(password, 12);
     hashing.then((hashedPassword) => {
         Auth.signUpUser(name, email, hashedPassword).then(() => {
