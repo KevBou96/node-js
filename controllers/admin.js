@@ -15,17 +15,20 @@ exports.postAddProduct = (req, res, next) => {
   const id = req.params.productId
   const title = req.body.title;
   const imageUrl = req.body.imageUrl;
-  const price = req.body.price;
+  const price = 'sd'
   const description = req.body.description;
   const product = new Product(null, title, imageUrl, description, price);
   product.saveProduct().then(() => {
     // res.status(200).location('/').json({message: 'product saved in databse'})
     res.redirect('/')
   }).catch(err => {
-    res.status(500).json({
-      message: 'Error, something went wrong',
-      error: err
-    })
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
+    // res.status(500).json({
+    //   message: 'Error, something went wrong',
+    //   error: err
+    // })
   })
 };
 
