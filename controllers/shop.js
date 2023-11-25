@@ -118,14 +118,12 @@ exports.getOrders = (req, res, next) => {
   const user_id = req.session.user_id;
   Order.getOrders(user_id).then(data => {
     console.log(data);
-    // res.render('shop/orders', {
-    //   path: '/orders',
-    //   pageTitle: 'Your Orders'
-    // });
-    res.status(200).json({
-      message: 'success',
-      response: data
-    })
+    return res.render('shop/orders', {
+      path: '/orders',
+      pageTitle: 'Your Orders',
+      orders: data
+    });
+    
   }).catch(err => {
     const error = new Error(err);
     error.httpStatusCode = 500;

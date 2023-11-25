@@ -12,20 +12,25 @@ const p = path.join(
 );
 
 module.exports = class Product {
-  constructor(id, title, imageUrl, description, price) {
+  constructor(id, title, imageurl, description, price) {
     this.id = id;
     this.title = title;
-    this.imageUrl = imageUrl;
+    this.imageUrl = imageurl;
     this.description = description;
     this.price = price;
   }
 
   saveProduct() {
-    return db.none(`INSERT INTO products(title, imgurl, price, description) VALUES($1, $2, $3, $4)`, [this.title, this.imageUrl, this.price, this.description])
+      return db.none(`INSERT INTO products(title, imgurl, price, description) VALUES($1, $2, $3, $4)`, [this.title, this.imageUrl, this.price, this.description])
   }
 
   updateProduct() {
-    return db.none('UPDATE products SET title = $1, imgurl = $2, price = $3, description = $4 WHERE product_id = $5', [this.title, this.imageUrl, this.price, this.description, this.id])
+    if (this.imageUrl) {
+      return db.none('UPDATE products SET title = $1, imgurl = $2, price = $3, description = $4 WHERE product_id = $5', [this.title, this.imageUrl, this.price, this.description, this.id])
+    } else {
+      return db.none('UPDATE products SET title = $1, price = $2, description = $3 WHERE product_id = $4', [this.title, this.price, this.description, this.id])
+    }
+    
   }
 
   static deleteById(id) {

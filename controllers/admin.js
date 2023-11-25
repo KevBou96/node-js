@@ -7,16 +7,26 @@ exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
     path: '/admin/add-product',
-    editing: false
+    editing: false,
+    errorMessage: null
   });
 };
 
 exports.postAddProduct = (req, res, next) => {
   const id = req.params.productId
   const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
+  const image = req.file;
   const price = req.body.price
   const description = req.body.description;
+  if (!image) {
+    return res.render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      path: '/admin/add-product',
+      editing: false,
+      errorMessage: 'file is not an image'
+    });
+  }
+  const imageUrl = image.path;
   const product = new Product(null, title, imageUrl, description, price);
   product.saveProduct().then(() => {
     // res.status(200).location('/').json({message: 'product saved in databse'})
@@ -43,7 +53,8 @@ exports.getEditProduct = (req, res, next) => {
       pageTitle: 'Edit Product',
       path: '/admin/edit-product',
       editing: editMode,
-      product: product
+      product: product,
+      errorMessage: null
     });
   }).catch(err => {
     const error = new Error(err);
@@ -56,17 +67,17 @@ exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.product_id;
   const updatedTitle = req.body.title;
   const updatedPrice = req.body.price;
-  const updatedImageUrl = req.body.imageUrl;
+  const image = req.file;
   const updatedDesc = req.body.description;
   const updatedProduct = new Product(
-    prodId,
-    updatedTitle,
-    updatedImageUrl,
-    updatedDesc,
-    updatedPrice
+    id = prodId,
+    title = updatedTitle,
+    imageurl = image ? image.path : null,
+    description = updatedDesc,
+    price = updatedPrice
   );
+  console.log(image);
   updatedProduct.updateProduct().then(data => {
-    console.log(data);
     res.redirect('/admin/products');
   }).catch(err => {
     const error = new Error(err);
