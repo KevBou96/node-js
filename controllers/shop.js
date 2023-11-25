@@ -9,6 +9,10 @@ exports.getProducts = (req, res, next) => {
       pageTitle: 'All Products',
       path: '/products'
     });
+  }).catch(err => {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
   });
 };
 
@@ -20,6 +24,10 @@ exports.getProduct = (req, res, next) => {
       pageTitle: product.title,
       path: '/products'
     });
+  }).catch(err => {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
   });
 };
 
@@ -30,6 +38,10 @@ exports.getIndex = (req, res, next) => {
       pageTitle: 'Shop',
       path: '/'
     });
+  }).catch(err => {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
   });
 };
 
@@ -49,8 +61,10 @@ exports.getCart = (req, res, next) => {
       tPrice: totalPrice
     })
   }).catch(err => {
-    console.log(err);
-  })  
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
+  });
 }
 
 exports.postCart = (req, res, next) => {
@@ -59,12 +73,10 @@ exports.postCart = (req, res, next) => {
   Cart.AddProductToCart(product_id, user_id).then((data) => {
     res.redirect('/cart');
   }).catch(err => {
-    console.log(err);
-    res.status(500).json({
-      message: 'parameters are missing',
-      error: err
-    })
-  })
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
+  });
 };
 
 exports.postCartDeleteProduct = (req, res, next) => {
@@ -73,11 +85,10 @@ exports.postCartDeleteProduct = (req, res, next) => {
   Cart.deleteProductFromCart(product_id, user_id).then((data) => {
     res.redirect('/cart')
   }).catch(err => {
-    res.status(500).json({
-      message: 'parameters are missing',
-      error: err
-    })
-  })
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
+  });
 };
 
 exports.emptyCart = (req, res, next) => {
@@ -85,11 +96,10 @@ exports.emptyCart = (req, res, next) => {
   Cart.emptyCart(user_id).then(() => {
     res.redirect('/orders')
   }).catch(err => {
-    res.status(500).json({
-      message: 'error',
-      error: err
-    })
-  })
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
+  });
 }
 
 exports.createOrder = (req, res, next) => {
@@ -98,12 +108,10 @@ exports.createOrder = (req, res, next) => {
   Order.createOrder(totalPrice, user_id).then((data) => {
     res.redirect('/orders')
   }).catch(err => {
-    console.log(err);
-    res.status(500).json({
-      message: 'error',
-      error: err
-    })
-  })
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
+  });
 } 
 
 exports.getOrders = (req, res, next) => {
@@ -119,10 +127,9 @@ exports.getOrders = (req, res, next) => {
       response: data
     })
   }).catch(err => {
-    res.status(500).json({
-      message: 'error',
-      error: err
-    })
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
   });
   
 };

@@ -40,19 +40,19 @@ exports.postLogin = (req, res, next) => {
                 req.flash('error', 'Wrong Password')
                 return res.redirect('/login')
             }).catch(err => {
-                console.log(err);
-            })
+                const error = new Error(err);
+                error.httpStatusCode = 500;
+                return next(error)
+              });
         } else {
             req.flash('error', 'Invalid email')
             return res.redirect('/login')
         }
     }).catch(err => {
-        console.log(err);
-        res.status(500).json({
-            message: 'user does not exists',
-            err: err
-        })
-    })
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error)
+      });
 }
 
 exports.getSignUp = (req, res, next) => {
@@ -79,29 +79,30 @@ exports.postSignUp = (req, res, next) => {
     const hashing = bcrypt.hash(password, 12);
     hashing.then((hashedPassword) => {
         Auth.signUpUser(name, email, hashedPassword).then(() => {
-            Auth.sendMailCreatedAccountMail(email).then((res) => {
-                console.log('email sent');
-            }).catch(err => {
-                res.status(500).json({
-                    message: 'email could not send',
-                    err: err
-                })
-            })
             res.redirect('/login')
+            Auth.sendMailCreatedAccountMail(email).then(() => {
+            }).catch(err => {
+                console.log('here');
+                const error = new Error(err);
+                error.httpStatusCode = 500;
+                return next(error)
+              });
         }).catch(err => {
-            res.status(500).json({
-                message: 'user already exists',
-                err: err
-            })
-        })
-    })
-    
+            const error = new Error(err);
+            error.httpStatusCode = 500;
+            return next(error)
+          });
+    }).catch(err => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error)
+      });
 }
 
 exports.logOut = (req, res , next) => {
     req.session.destroy(err => {
         console.log(err);
-        res.redirect('/')
+        res.redirect('/login')
     })
 }
 

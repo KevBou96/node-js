@@ -15,7 +15,7 @@ exports.postAddProduct = (req, res, next) => {
   const id = req.params.productId
   const title = req.body.title;
   const imageUrl = req.body.imageUrl;
-  const price = 'sd'
+  const price = req.body.price
   const description = req.body.description;
   const product = new Product(null, title, imageUrl, description, price);
   product.saveProduct().then(() => {
@@ -25,10 +25,6 @@ exports.postAddProduct = (req, res, next) => {
     const error = new Error(err);
     error.httpStatusCode = 500;
     return next(error)
-    // res.status(500).json({
-    //   message: 'Error, something went wrong',
-    //   error: err
-    // })
   })
 };
 
@@ -38,7 +34,8 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect('/');
   }
   const prodId = req.params.productId;
-  Product.findById(prodId).then(product => {
+  Product.findById(prodId)
+  .then(product => {
     if (!product) {
       return res.redirect('/');
     }
@@ -48,6 +45,10 @@ exports.getEditProduct = (req, res, next) => {
       editing: editMode,
       product: product
     });
+  }).catch(err => {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
   });
 };
 
@@ -68,7 +69,9 @@ exports.postEditProduct = (req, res, next) => {
     console.log(data);
     res.redirect('/admin/products');
   }).catch(err => {
-    console.log(err);
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
   })
 };
 
@@ -87,6 +90,8 @@ exports.postDeleteProduct = (req, res, next) => {
   Product.deleteById(prodId).then(() => {
     res.redirect('/admin/products');
   }).catch(err => {
-    console.log(err);
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
   })
 };
