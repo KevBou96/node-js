@@ -44,5 +44,13 @@ module.exports = class Product {
   static getProducts() {
     return db.any('select * from products order by product_id');
   }
+
+  static getProductsLimit(offset) {
+    return db.any('select * from products order by product_id limit 4 offset $1', offset);
+  }
+
+  static getProductsCount() {
+    return db.oneOrNone('SELECT count(*) FROM products')
+  }
 };
 

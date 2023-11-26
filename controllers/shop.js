@@ -3,7 +3,9 @@ const Cart = require('../models/cart');
 const Order = require('../models/order');
 const PDFdoc = require('pdfkit');
 const path = require('path');
-const fs = require('fs')
+const fs = require('fs');
+
+const ITEMS_PER_PAGE = 4;
 
 exports.getProducts = (req, res, next) => {
   Product.getProducts().then(products => {
@@ -35,12 +37,35 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-  Product.getProducts().then(products => {
-    res.render('shop/index', {
-      prods: products,
-      pageTitle: 'Shop',
-      path: '/'
-    });
+  let page = req.query.page;
+  let totalItems;
+  page = page === undefined ? 1 : page; 
+  Product.getProductsCount()
+  .then((productCount) => {
+    totalItems = productCount.count;
+    if (totalItems == 0) {
+      const error = new Error(err);
+      error.httpStatusCode = 404;
+      return next(error)
+    }
+    const offset = (page - 1) * ITEMS_PER_PAGE;
+    Product.getProductsLimit(offset).then(products => {
+      res.render('shop/index', {
+        prods: products,
+        pageTitle: 'Shop',
+        path: '/',
+        // currentPage: page,
+        // hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+        // hasPreviousPage: page > 1,
+        // nextPage: page + 1,
+        // previousPage: page - 1,
+        // lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE)
+      });
+    }).catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error)
+      })
   }).catch(err => {
     const error = new Error(err);
     error.httpStatusCode = 500;
