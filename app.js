@@ -58,8 +58,10 @@ app.use(errorController.get404);
 app.use((error, req, res, next) => {
     console.log(error);
     if (error.httpStatusCode == 500) {
-        
         res.redirect('/500');
+    }
+    if (error.httpStatusCode == 404) {
+        res.redirect('/404')
     }
     return
 })

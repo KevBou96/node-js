@@ -27,6 +27,15 @@ module.exports = class Order {
         return db.any('SELECT * FROM orders WHERE user_id = $1', user_id)
       }
 
+      static verifyOrderData(user_id, order_id) {
+        return db.any('SELECT total FROM orders WHERE user_id = $1 AND order_id = $2', [user_id, order_id])
+      }
+
+
+      static getOrderData(order_id) {
+        return db.any('SELECT p.product_id, p.title, p.price, p.description, i.qty FROM products p INNER JOIN order_items i ON i.product_id = p.product_id WHERE i.order_id = $1', order_id)
+      }
+
       // static getOrders(user_id) {
       //   return db.any('SELECT i.order_id, i.product_id, i.qty, o.total FROM order_items i INNER JOIN orders o ON i.order_id = o.order_id WHERE o.user_id = $1', user_id);
       // }

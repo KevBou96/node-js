@@ -1,6 +1,9 @@
 const Product = require('../models/product');
 const Cart = require('../models/cart');
 const Order = require('../models/order');
+const PDFdoc = require('pdfkit');
+const path = require('path');
+const fs = require('fs')
 
 exports.getProducts = (req, res, next) => {
   Product.getProducts().then(products => {
@@ -117,7 +120,6 @@ exports.createOrder = (req, res, next) => {
 exports.getOrders = (req, res, next) => {
   const user_id = req.session.user_id;
   Order.getOrders(user_id).then(data => {
-    console.log(data);
     return res.render('shop/orders', {
       path: '/orders',
       pageTitle: 'Your Orders',
@@ -138,3 +140,55 @@ exports.getCheckout = (req, res, next) => {
     pageTitle: 'Checkout'
   });
 };
+
+exports.getInvoice = (req, res, next) => {
+   const orderId = req.params.orderId;
+   const user_id = req.session.user_id;
+   Order.verifyOrderData(user_id, orderId)
+   .then((invoiceData) => {
+    if (invoiceData.length == 0) {
+      const error = new Error('No order found');
+      error.httpStatusCode = 404;
+      return next(error);
+    }
+    Order.getOrderData(orderId)
+    .then((orderData) => {
+      if (orderData.length == 0) {
+        const error = new Error('No order found');
+        error.httpStatusCode = 404;
+        return next(error);
+      }
+      generatePdf(orderId, orderData, invoiceData[0], res);
+    }).catch(err => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error)
+    });
+   }).catch(err => {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error)
+  });
+}
+
+function generatePdf(order_id, order_data, invoice_data, res) {
+    const totalPrice = invoice_data.total;
+    const invoiceName = 'invoice-' + order_id + '.pdf';
+    const invoicePath = path.join('data', 'invoices', invoiceName);
+    const pdfDoc = new PDFdoc();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="' + invoiceName + '"')
+    pdfDoc.pipe(fs.createWriteStream(invoicePath));
+    pdfDoc.pipe(res);
+    pdfDoc.fontSize(26).text('Invoice', {
+      underline: true
+    });
+    pdfDoc.text('-------------------------------------------------');
+    order_data.forEach(product => {
+      pdfDoc.fontSize(14).text(product.title + ' - ' + product.qty + 'x' + '$' + product.price)
+    })
+    pdfDoc.fontSize(20).text('Total price: $' + totalPrice, {
+      underline: true
+    });
+    pdfDoc.end();
+}
